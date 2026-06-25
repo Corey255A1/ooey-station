@@ -1,0 +1,44 @@
+game:
+    title: "Hello Booey"
+    author: "Corey"
+
+palette:
+    sky: rgb(20, 30, 40)
+    white: rgb(255, 255, 255)
+    yellow: rgb(255, 255, 0)
+    red: rgb(255, 0, 0)
+    dark: rgb(0, 0, 0)
+
+sprites:
+    smiley 8x8:
+        . . y y y y . .
+        . y y y y y y .
+        y y d y y d y y
+        y y y y y y y y
+        y y r y y r y y
+        y y r r r r y y
+        . y y y y y y .
+        . . y y y y . .
+
+vars:
+    x: int = 100
+    y: int = 100
+
+fn init():
+    x = 300
+    y = 200
+
+fn update():
+    cls(sky)
+    draw_text(20, 20, "Welcome to Ooey-Station!", white)
+    
+    if btn_held(LEFT):
+        x = x - 4
+    if btn_held(RIGHT):
+        x = x + 4
+    if btn_held(UP):
+        y = y - 4
+    if btn_held(DOWN):
+        y = y + 4
+        
+    draw_sprite(smiley, x, y)
