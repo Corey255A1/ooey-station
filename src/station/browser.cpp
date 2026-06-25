@@ -81,11 +81,12 @@ void GameBrowser::handle_input(ooey::InputManager* input) {
 
     for (const auto& event : input->get_key_events()) {
         if (event.state == ooey::KeyState::Pressed) {
-            if (event.key_code == 65362 || event.key_code == 119) { // Up or 'w'
+            int k = event.key_code;
+            if (k == 65362 || k == 119 || k == 87 || k == 38 || k == 103) { // Up, 'w', 'W', VK_UP, KEY_UP
                 selected_index_ = std::max(0, selected_index_ - 1);
-            } else if (event.key_code == 65364 || event.key_code == 115) { // Down or 's'
+            } else if (k == 65364 || k == 115 || k == 83 || k == 40 || k == 108) { // Down, 's', 'S', VK_DOWN, KEY_DOWN
                 selected_index_ = std::min(static_cast<int>(games_.size()) - 1, selected_index_ + 1);
-            } else if (event.key_code == 65293) { // Enter
+            } else if (k == 65293 || k == 13 || k == 10 || k == 36 || k == 28) { // Enter, Return, VK_RETURN, KEY_ENTER
                 if (on_launch_game_) {
                     on_launch_game_(games_[selected_index_]);
                 }
