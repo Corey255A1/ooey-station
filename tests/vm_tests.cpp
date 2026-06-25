@@ -20,7 +20,7 @@ void test_basic_arithmetic() {
         'B', 'O', 'O', 'E', // Magic
         0x01, 0x00,          // Version
         0x00, 0x00,          // Flags
-        18, 0, 0, 0,         // Code size: 18 bytes
+        16, 0, 0, 0,         // Code size: 16 bytes
         0, 0, 0, 0,          // Data size
         0, 0, 0, 0,          // Asset size
         0, 0, 0, 0,          // Entry point

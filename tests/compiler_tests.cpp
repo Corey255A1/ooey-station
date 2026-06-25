@@ -61,7 +61,38 @@ void test_parser_and_codegen() {
     std::cout << "test_parser_and_codegen passed!" << std::endl;
 }
 
+#include <fstream>
+#include <sstream>
+
+void test_hello_world() {
+    std::cout << "Running test_hello_world..." << std::endl;
+    std::ifstream in("games/hello-world/main.booey");
+    assert(in.is_open());
+    std::stringstream ss;
+    ss << in.rdbuf();
+    std::string source = ss.str();
+    in.close();
+
+    try {
+        Lexer lexer(source);
+        auto tokens = lexer.tokenize();
+        std::cout << "Tokens count: " << tokens.size() << std::endl;
+        Parser parser(tokens);
+        auto ast = parser.parse();
+        assert(ast != nullptr);
+        Codegen codegen;
+        auto binary = codegen.generate(ast.get());
+        assert(!binary.empty());
+        std::cout << "test_hello_world passed! Compiled size: " << binary.size() << std::endl;
+    } catch (const std::exception& ex) {
+        std::cout << "test_hello_world FAILED with exception: " << ex.what() << std::endl;
+        throw;
+    }
+}
+
 void run_compiler_tests() {
     test_lexer();
     test_parser_and_codegen();
+    test_hello_world();
 }
+

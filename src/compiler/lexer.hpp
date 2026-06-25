@@ -53,7 +53,7 @@ private:
     char advance();
     bool is_at_end() const;
     
-    void handle_indentation();
+    bool handle_indentation();
     Token scan_token();
     
     Token make_token(TokenType type, const std::string& val = "");

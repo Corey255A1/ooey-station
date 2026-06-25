@@ -1,4 +1,5 @@
 #include <gooey/application.hpp>
+#include <ooey/platform.hpp>
 #include "console/display.hpp"
 #include "console/input.hpp"
 #include "vm/vm.hpp"
@@ -37,6 +38,13 @@ uint32_t find_sprite_address(uint32_t sprite_id, const std::vector<uint8_t>& vra
 
 int main() {
     gooey::Application app;
+
+    auto backend = ooey::create_default_window_backend();
+    if (!backend || !backend->create({800, 600}, "Ooey-Station")) {
+        std::cerr << "Failed to create window\n";
+        return 1;
+    }
+    app.set_window_backend(std::move(backend));
 
     // Scan for games
     std::string games_dir = OOEY_STATION_GAMES_DIR;
@@ -98,7 +106,7 @@ int main() {
         }
     };
 
-    app.set_root_view(std::move(browser));
+    app.set_root_view(browser);
 
     // Global timing
     auto start_time = std::chrono::steady_clock::now();

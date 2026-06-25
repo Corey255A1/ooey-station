@@ -1,0 +1,6 @@
+title=Hello Booey
+author=Corey
+version=1.0
+description=An interactive hello-world program showing sprite drawing and keyboard input.
+genre=Tech Demo
+release_date=2026-06-25

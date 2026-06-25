@@ -56,6 +56,7 @@ private:
     std::unique_ptr<ExpressionNode> parse_primary();
 
     DataType parse_data_type(const std::string& type_str);
+    void parse_dimensions(int& w, int& h);
 };
 
 } // namespace ooey_station::compiler

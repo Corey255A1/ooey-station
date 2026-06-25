@@ -112,6 +112,48 @@ void Codegen::visit(StringLiteralNode* node) {
 void Codegen::visit(VarAccessNode* node) {
     int r = allocate_register();
     
+    // Check button constants
+    static const std::map<std::string, uint32_t> button_constants = {
+        {"UP", 0}, {"DOWN", 1}, {"LEFT", 2}, {"RIGHT", 3},
+        {"A", 4}, {"B", 5}, {"C", 6}, {"X", 7}, {"Y", 8}, {"Z", 9},
+        {"START", 10}, {"SELECT", 11}
+    };
+    
+    auto btn_it = button_constants.find(node->name);
+    if (btn_it != button_constants.end()) {
+        emit_8(vm::OP_MOVI);
+        emit_8(r);
+        emit_32(btn_it->second);
+        return;
+    }
+
+    // Check color palette constants
+    auto col_it = color_palette_.find(node->name);
+    if (col_it != color_palette_.end()) {
+        emit_8(vm::OP_MOVI);
+        emit_8(r);
+        emit_32(col_it->second);
+        return;
+    }
+    
+    // Check sprite constant IDs
+    auto spr_it = sprite_ids_.find(node->name);
+    if (spr_it != sprite_ids_.end()) {
+        emit_8(vm::OP_MOVI);
+        emit_8(r);
+        emit_32(spr_it->second);
+        return;
+    }
+    
+    // Check tile constant IDs
+    auto tile_it = tile_ids_.find(node->name);
+    if (tile_it != tile_ids_.end()) {
+        emit_8(vm::OP_MOVI);
+        emit_8(r);
+        emit_32(tile_it->second);
+        return;
+    }
+
     auto local_it = local_vars_.find(node->name);
     if (local_it != local_vars_.end()) {
         // Local variable is assigned to a register
@@ -365,6 +407,73 @@ void Codegen::visit(FuncCallNode* node) {
     }
     else if (node->name == "exit") {
         emit_8(vm::OP_EXIT);
+    }
+    else if (node->name == "draw_sprite") {
+        node->args[0]->accept(this);
+        int rid = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rx = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int ry = next_free_register_ - 1;
+        
+        emit_8(vm::OP_SPR);
+        emit_8(rid);
+        emit_8(rx);
+        emit_8(ry);
+        
+        free_register(ry);
+        free_register(rx);
+        free_register(rid);
+    }
+    else if (node->name == "line") {
+        node->args[0]->accept(this);
+        int rx1 = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int ry1 = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int rx2 = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int ry2 = next_free_register_ - 1;
+        node->args[4]->accept(this);
+        int rc = next_free_register_ - 1;
+        
+        emit_8(vm::OP_LINE);
+        emit_8(rx1);
+        emit_8(ry1);
+        emit_8(rx2);
+        emit_8(ry2);
+        emit_8(rc);
+        
+        free_register(rc);
+        free_register(ry2);
+        free_register(rx2);
+        free_register(ry1);
+        free_register(rx1);
+    }
+    else if (node->name == "rect") {
+        node->args[0]->accept(this);
+        int rx = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int ry = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int rw = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int rh = next_free_register_ - 1;
+        node->args[4]->accept(this);
+        int rc = next_free_register_ - 1;
+        
+        emit_8(vm::OP_RECT);
+        emit_8(rx);
+        emit_8(ry);
+        emit_8(rw);
+        emit_8(rh);
+        emit_8(rc);
+        
+        free_register(rc);
+        free_register(rh);
+        free_register(rw);
+        free_register(ry);
+        free_register(rx);
     }
     else {
         // User function call

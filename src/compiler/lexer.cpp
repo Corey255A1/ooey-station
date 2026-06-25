@@ -58,8 +58,8 @@ void Lexer::skip_whitespace_and_comments() {
     }
 }
 
-void Lexer::handle_indentation() {
-    if (!at_line_start_) return;
+bool Lexer::handle_indentation() {
+    if (!at_line_start_) return false;
 
     int spaces = 0;
     while (!is_at_end() && (peek() == ' ' || peek() == '\t')) {
@@ -74,7 +74,7 @@ void Lexer::handle_indentation() {
     skip_whitespace_and_comments();
     if (peek() == '\n' || is_at_end()) {
         if (peek() == '\n') advance();
-        return; 
+        return true; 
     }
 
     int current_indent = indent_stack_.back();
@@ -91,6 +91,7 @@ void Lexer::handle_indentation() {
         }
     }
     at_line_start_ = false;
+    return false;
 }
 
 Token Lexer::make_token(TokenType type, const std::string& val) {
@@ -105,7 +106,9 @@ std::vector<Token> Lexer::tokenize() {
         if (is_at_end()) break;
 
         if (at_line_start_) {
-            handle_indentation();
+            if (handle_indentation()) {
+                continue;
+            }
             // Process any pending Indent/Dedent tokens we just generated
             for (const auto& t : pending_tokens_) {
                 tokens.push_back(t);

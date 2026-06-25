@@ -76,6 +76,29 @@ DataType Parser::parse_data_type(const std::string& type_str) {
     return DataType::Unknown;
 }
 
+void Parser::parse_dimensions(int& w, int& h) {
+    if (check(TokenType::IntLiteral)) {
+        Token width_tok = consume(TokenType::IntLiteral, "Expected width");
+        w = std::stoi(width_tok.value);
+        
+        Token x_tok = consume(TokenType::Identifier, "Expected 'x' or 'x<height>'");
+        if (x_tok.value == "x") {
+            Token height_tok = consume(TokenType::IntLiteral, "Expected height");
+            h = std::stoi(height_tok.value);
+        } else if (x_tok.value[0] == 'x') {
+            h = std::stoi(x_tok.value.substr(1));
+        } else {
+            throw std::runtime_error("Parser Error: Invalid dimension format. Expected <width>x<height>");
+        }
+    } else {
+        Token size_tok = consume(TokenType::Identifier, "Expected dimensions (e.g. 16x16)");
+        if (std::sscanf(size_tok.value.c_str(), "%dx%d", &w, &h) != 2) {
+            throw std::runtime_error("Parser Error: Invalid size format: " + size_tok.value);
+        }
+    }
+}
+
+
 std::unique_ptr<ProgramNode> Parser::parse() {
     auto program = std::make_unique<ProgramNode>();
     
@@ -170,12 +193,8 @@ void Parser::parse_sprites_block(ProgramNode& program) {
         if (match(TokenType::Newline)) continue;
         
         std::string name = consume(TokenType::Identifier, "Expected sprite name").value;
-        std::string size_str = consume(TokenType::Identifier, "Expected sprite dimensions (e.g. 16x16)").value;
-        
         int w = 0, h = 0;
-        if (std::sscanf(size_str.c_str(), "%dx%d", &w, &h) != 2) {
-            throw std::runtime_error("Parser Error: Invalid sprite size format: " + size_str);
-        }
+        parse_dimensions(w, h);
         
         consume(TokenType::Colon, "Expected ':' after sprite header");
         consume(TokenType::Newline, "Expected newline after sprite header");
@@ -216,12 +235,8 @@ void Parser::parse_tiles_block(ProgramNode& program) {
         if (match(TokenType::Newline)) continue;
         
         std::string name = consume(TokenType::Identifier, "Expected tile name").value;
-        std::string size_str = consume(TokenType::Identifier, "Expected tile dimensions (e.g. 8x8)").value;
-        
         int w = 0, h = 0;
-        if (std::sscanf(size_str.c_str(), "%dx%d", &w, &h) != 2) {
-            throw std::runtime_error("Parser Error: Invalid tile size format: " + size_str);
-        }
+        parse_dimensions(w, h);
         
         consume(TokenType::Colon, "Expected ':' after tile header");
         consume(TokenType::Newline, "Expected newline after tile header");
@@ -337,6 +352,12 @@ std::unique_ptr<StatementNode> Parser::parse_statement() {
         stmt = parse_return_statement();
     } else if (match(TokenType::KwLet)) {
         stmt = parse_let_statement();
+    } else if (check(TokenType::Identifier) && cursor_ + 1 < tokens_.size() && tokens_[cursor_ + 1].type == TokenType::Equals) {
+        std::string name = consume(TokenType::Identifier, "Expected variable name").value;
+        consume(TokenType::Equals, "Expected '='");
+        auto expr = parse_expression();
+        stmt = std::make_unique<VarDeclNode>(name, DataType::Unknown, std::move(expr));
+        consume(TokenType::Newline, "Expected newline after assignment");
     } else {
         auto expr = parse_expression();
         stmt = std::make_unique<ExprStatementNode>(std::move(expr));
