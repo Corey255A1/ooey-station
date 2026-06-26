@@ -45,10 +45,78 @@ void test_basic_arithmetic() {
     std::cout << "test_basic_arithmetic passed!" << std::endl;
 }
 
+#include "compiler/lexer.hpp"
+#include "compiler/parser.hpp"
+#include "compiler/codegen.hpp"
+#include <fstream>
+#include <sstream>
+
+void test_hello_world_execution() {
+    std::cout << "Running test_hello_world_execution..." << std::endl;
+    std::ifstream in("games/hello-world/main.booey");
+    assert(in.is_open());
+    std::stringstream ss;
+    ss << in.rdbuf();
+    std::string source = ss.str();
+    in.close();
+
+    using namespace ooey_station::compiler;
+    Lexer lexer(source);
+    auto tokens = lexer.tokenize();
+    Parser parser(tokens);
+    auto ast = parser.parse();
+    Codegen codegen;
+    auto binary = codegen.generate(ast.get());
+
+    BooeyVM vm;
+    bool loaded = vm.load_program(binary);
+    assert(loaded);
+
+    std::cout << "Compiled bytecode (size " << binary.size() << "):" << std::endl;
+    for (size_t i = 0; i < binary.size(); ++i) {
+        printf("%02x ", binary[i]);
+        if ((i + 1) % 16 == 0) std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    // Run first frame (executes bootstrap which calls init() and then update() once before hitting VBLANK)
+    vm.run_frame();
+    
+    // x is at RAM address 0, y is at RAM address 4
+    uint32_t x = vm.read_memory_32(0);
+    uint32_t y = vm.read_memory_32(4);
+    std::cout << "After init, x=" << x << ", y=" << y << std::endl;
+    assert(x == 300);
+    assert(y == 200);
+
+    // Now hold LEFT (bit 2 of 0x1C000)
+    vm.write_memory_32(0x1C000, 1 << 2); // LEFT is bit 2 (ButtonId::Left)
+    
+    // Run second frame (should run update() again)
+    vm.run_frame();
+
+    x = vm.read_memory_32(0);
+    y = vm.read_memory_32(4);
+    std::cout << "After holding LEFT, x=" << x << ", y=" << y << std::endl;
+    assert(x == 296); // Should decrease by 4
+
+    // Now hold RIGHT (bit 3)
+    vm.write_memory_32(0x1C000, 1 << 3); // RIGHT is bit 3 (ButtonId::Right)
+    vm.run_frame();
+
+    x = vm.read_memory_32(0);
+    y = vm.read_memory_32(4);
+    std::cout << "After holding RIGHT, x=" << x << ", y=" << y << std::endl;
+    assert(x == 300); // Should increase back to 300
+    
+    std::cout << "test_hello_world_execution passed!" << std::endl;
+}
+
 int main() {
     std::cout << "Starting Ooey-Station Test Suite..." << std::endl;
     
     test_basic_arithmetic();
+    test_hello_world_execution();
     run_compiler_tests();
     run_console_tests();
     

@@ -151,38 +151,38 @@ Token Lexer::scan_token() {
         case ',': return make_token(TokenType::Comma);
         case '.': return make_token(TokenType::Dot);
         
-        case '+': return make_token(TokenType::Plus);
-        case '-': return make_token(TokenType::Minus);
-        case '*': return make_token(TokenType::Star);
-        case '/': return make_token(TokenType::Slash);
+        case '+': return make_token(TokenType::Plus, "+");
+        case '-': return make_token(TokenType::Minus, "-");
+        case '*': return make_token(TokenType::Star, "*");
+        case '/': return make_token(TokenType::Slash, "/");
         
         case '=':
             if (peek() == '=') {
                 advance();
-                return make_token(TokenType::EqualsEquals);
+                return make_token(TokenType::EqualsEquals, "==");
             }
-            return make_token(TokenType::Equals);
+            return make_token(TokenType::Equals, "=");
             
         case '!':
             if (peek() == '=') {
                 advance();
-                return make_token(TokenType::NotEquals);
+                return make_token(TokenType::NotEquals, "!=");
             }
             throw std::runtime_error("Lexer Error: Unexpected character '!' at line " + std::to_string(line_));
             
         case '<':
             if (peek() == '=') {
                 advance();
-                return make_token(TokenType::LessEqual);
+                return make_token(TokenType::LessEqual, "<=");
             }
-            return make_token(TokenType::LessThan);
+            return make_token(TokenType::LessThan, "<");
             
         case '>':
             if (peek() == '=') {
                 advance();
-                return make_token(TokenType::GreaterEqual);
+                return make_token(TokenType::GreaterEqual, ">=");
             }
-            return make_token(TokenType::GreaterThan);
+            return make_token(TokenType::GreaterThan, ">");
             
         case '"': {
             std::string str;

@@ -548,6 +548,7 @@ void Codegen::visit(IfNode* node) {
     
     emit_8(vm::OP_MOVI);
     int r_zero = allocate_register();
+    emit_8(r_zero);
     emit_32(0);
     
     emit_8(vm::OP_CMP);
@@ -589,6 +590,7 @@ void Codegen::visit(WhileNode* node) {
     
     emit_8(vm::OP_MOVI);
     int r_zero = allocate_register();
+    emit_8(r_zero);
     emit_32(0);
     
     emit_8(vm::OP_CMP);
@@ -653,6 +655,7 @@ void Codegen::visit(ForNode* node) {
     // Increment: index += 1
     emit_8(vm::OP_MOVI);
     int r_one = allocate_register();
+    emit_8(r_one);
     emit_32(1);
     emit_8(vm::OP_ADD);
     emit_8(r_idx);
@@ -686,9 +689,13 @@ void Codegen::visit(ReturnNode* node) {
 }
 
 void Codegen::visit(ExprStatementNode* node) {
+    int before = next_free_register_;
     node->expr->accept(this);
-    // Discard expression result
-    free_register(next_free_register_ - 1);
+    int after = next_free_register_;
+    if (after > before) {
+        // Discard expression result
+        free_register(after - 1);
+    }
 }
 
 void Codegen::visit(FunctionNode* node) {

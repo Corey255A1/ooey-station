@@ -79,7 +79,41 @@ void InputController::setup_default_bindings() {
     key_bindings_[54]    = ButtonId::Select; // Linux Right Shift (key code)
 }
 
-void InputController::update(ooey::InputManager* input_manager) {
+struct VirtualButton {
+    ButtonId id;
+    float cx, cy;
+    float r;
+    bool is_rect = false;
+    float w = 0, h = 0;
+};
+
+static std::vector<VirtualButton> get_virtual_buttons(int W, int H) {
+    float base_size = std::min(W, H) / 6.0f;
+    if (base_size < 60.0f) base_size = 60.0f;
+    if (base_size > 120.0f) base_size = 120.0f;
+
+    std::vector<VirtualButton> buttons;
+
+    // A, B, C, X, Y, Z buttons on the right
+    float btn_r = base_size * 0.25f;
+    buttons.push_back({ButtonId::A, static_cast<float>(W) - 180.0f, static_cast<float>(H) - 70.0f, btn_r});
+    buttons.push_back({ButtonId::B, static_cast<float>(W) - 120.0f, static_cast<float>(H) - 90.0f, btn_r});
+    buttons.push_back({ButtonId::C, static_cast<float>(W) - 60.0f, static_cast<float>(H) - 110.0f, btn_r});
+    
+    buttons.push_back({ButtonId::X, static_cast<float>(W) - 200.0f, static_cast<float>(H) - 130.0f, btn_r});
+    buttons.push_back({ButtonId::Y, static_cast<float>(W) - 140.0f, static_cast<float>(H) - 150.0f, btn_r});
+    buttons.push_back({ButtonId::Z, static_cast<float>(W) - 80.0f, static_cast<float>(H) - 170.0f, btn_r});
+
+    // Select and Start in the middle
+    float sys_w = 60.0f;
+    float sys_h = 24.0f;
+    buttons.push_back({ButtonId::Select, static_cast<float>(W)/2.0f - 70.0f, static_cast<float>(H) - 30.0f, 0, true, sys_w, sys_h});
+    buttons.push_back({ButtonId::Start, static_cast<float>(W)/2.0f + 70.0f, static_cast<float>(H) - 30.0f, 0, true, sys_w, sys_h});
+
+    return buttons;
+}
+
+void InputController::update(ooey::InputManager* input_manager, int window_w, int window_h) {
     if (!input_manager) return;
 
     previous_state_ = current_state_;
@@ -93,6 +127,57 @@ void InputController::update(ooey::InputManager* input_manager) {
     for (const auto& [keycode, btn] : key_bindings_) {
         if (input_manager->is_key_pressed(keycode)) {
             current_state_.buttons[static_cast<int>(btn)] = true;
+        }
+    }
+
+    // Map active pointer events to virtual keypad buttons
+    float base_size = std::min(window_w, window_h) / 6.0f;
+    if (base_size < 60.0f) base_size = 60.0f;
+    if (base_size > 120.0f) base_size = 120.0f;
+    
+    float dpad_cx = 30.0f + base_size;
+    float dpad_cy = window_h - 30.0f - base_size;
+    float dpad_r = base_size;
+
+    auto v_btns = get_virtual_buttons(window_w, window_h);
+
+    const auto& pointers = input_manager->get_active_pointers();
+    for (const auto& ptr : pointers) {
+        if (ptr.state == ooey::PointerState::Pressed || ptr.state == ooey::PointerState::Moved) {
+            float px = ptr.x;
+            float py = ptr.y;
+
+            // Test D-Pad
+            float dx = px - dpad_cx;
+            float dy = py - dpad_cy;
+            float dist_sq = dx*dx + dy*dy;
+            if (dist_sq <= dpad_r * dpad_r && dist_sq > (dpad_r * 0.15f) * (dpad_r * 0.15f)) {
+                if (std::abs(dx) > std::abs(dy)) {
+                    if (dx > 0) current_state_.buttons[static_cast<int>(ButtonId::Right)] = true;
+                    else current_state_.buttons[static_cast<int>(ButtonId::Left)] = true;
+                } else {
+                    if (dy > 0) current_state_.buttons[static_cast<int>(ButtonId::Down)] = true;
+                    else current_state_.buttons[static_cast<int>(ButtonId::Up)] = true;
+                }
+            }
+
+            // Test face/system buttons
+            for (const auto& btn : v_btns) {
+                if (btn.is_rect) {
+                    float half_w = btn.w / 2.0f;
+                    float half_h = btn.h / 2.0f;
+                    if (px >= btn.cx - half_w && px <= btn.cx + half_w &&
+                        py >= btn.cy - half_h && py <= btn.cy + half_h) {
+                        current_state_.buttons[static_cast<int>(btn.id)] = true;
+                    }
+                } else {
+                    float bdx = px - btn.cx;
+                    float bdy = py - btn.cy;
+                    if (bdx*bdx + bdy*bdy <= btn.r * btn.r) {
+                        current_state_.buttons[static_cast<int>(btn.id)] = true;
+                    }
+                }
+            }
         }
     }
 

@@ -6,9 +6,11 @@
 #include <functional>
 #include <vector>
 
+#include <gooey/mvvmc/i_interactive.hpp>
+
 namespace ooey_station::station {
 
-class GameBrowser : public gooey::GooeyNode {
+class GameBrowser : public gooey::GooeyNode, public gooey::mvvmc::IInteractive {
 public:
     GameBrowser();
     ~GameBrowser() override = default;
@@ -17,6 +19,9 @@ public:
     void set_on_launch_game(std::function<void(const GameInfo&)> cb) { on_launch_game_ = cb; }
 
     void handle_input(ooey::InputManager* input);
+    bool on_pointer_event(const ooey::Pointer& /*e*/) override { return false; }
+    bool on_key_event(const ooey::KeyEvent& e) override;
+    ooey::Rect bounds() const override { return layout_bounds; }
 
     // Override draw to customize the retro theme
     void draw(ooey::IRenderTarget& target) const override;

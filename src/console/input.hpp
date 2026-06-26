@@ -32,7 +32,7 @@ public:
     InputController();
     ~InputController() = default;
 
-    void update(ooey::InputManager* input_manager);
+    void update(ooey::InputManager* input_manager, int window_w, int window_h);
 
     bool is_pressed(ButtonId btn) const;
     bool is_held(ButtonId btn) const;

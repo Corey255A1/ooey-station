@@ -19,6 +19,18 @@ void BooeyVM::reset() {
     std::fill(aram_.begin(), aram_.end(), 0);
     std::fill(mmio_.begin(), mmio_.end(), 0);
     
+    // Copy initial static data into Game RAM (starting at 0x0000)
+    if (!static_data_.empty()) {
+        size_t copy_size = std::min(static_data_.size(), ram_.size());
+        std::memcpy(ram_.data(), static_data_.data(), copy_size);
+    }
+
+    // Copy assets directly to VRAM (starting at 0x0000 of VRAM)
+    if (!assets_.empty()) {
+        size_t asset_copy_size = std::min(assets_.size(), vram_.size());
+        std::memcpy(vram_.data(), assets_.data(), asset_copy_size);
+    }
+    
     registers_.fill(0);
     pc_ = entry_point_;
     
@@ -533,6 +545,9 @@ void BooeyVM::execute_instruction() {
             uint8_t rbtn = code_[pc_++] & 0xF;
             // MMIO offset 0x1C000 holds the "held" state bitmask
             uint32_t held_mask = read_memory_32(0x1C000);
+            if (held_mask != 0) {
+                std::cout << "VM: OP_BTNH read held_mask=" << held_mask << ", checking button=" << registers_[rbtn] << " (reg " << (int)rbtn << ")" << std::endl;
+            }
             registers_[rd] = (held_mask & (1 << registers_[rbtn])) ? 1 : 0;
             break;
         }
