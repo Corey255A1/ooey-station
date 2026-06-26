@@ -36,6 +36,8 @@ public:
     void set_draw_text_callback(auto&& cb) { draw_text_callback_ = cb; }
     void set_clear_callback(auto&& cb) { clear_callback_ = cb; }
     void set_draw_sprite_callback(auto&& cb) { draw_sprite_callback_ = cb; }
+    void set_sfx_callback(auto&& cb) { sfx_callback_ = cb; }
+    void set_play_callback(auto&& cb) { play_callback_ = cb; }
 
     // VM State queries
     bool is_halted() const { return halted_; }
@@ -51,6 +53,12 @@ public:
     const std::vector<uint8_t>& get_aram() const { return aram_; }
     
 private:
+    struct VM_TileLayer {
+        std::vector<uint16_t> tiles;
+        int scroll_x = 0;
+        int scroll_y = 0;
+    };
+
     // Memory arrays
     std::vector<uint8_t> ram_;   // 64 KB (0x00000 - 0x0FFFF)
     std::vector<uint8_t> vram_;  // 32 KB (0x10000 - 0x17FFF)
@@ -75,6 +83,9 @@ private:
     // Call stack (separate from RAM to prevent stack overflow exploits in sandboxed env)
     std::vector<uint32_t> call_stack_;
 
+    // Tile layers
+    std::array<VM_TileLayer, 4> tile_layers_;
+
     // Execution state
     bool halted_{false};
     bool exited_{false};
@@ -89,6 +100,12 @@ private:
     std::function<void(int, int, uint32_t, uint32_t)> draw_text_callback_; // x, y, str_addr, color
     std::function<void(uint32_t)> clear_callback_;
     std::function<void(uint32_t, int, int, uint32_t)> draw_sprite_callback_; // id, x, y, flags
+    std::function<void(uint32_t)> sfx_callback_;
+    std::function<void(uint32_t, uint32_t, uint32_t, uint32_t)> play_callback_;
+
+    uint32_t find_sprite_address(uint32_t sprite_id) const;
+    int get_layer_tile_size(uint32_t layer) const;
+    bool check_sprite_collision(uint32_t rid1, int32_t rx1, int32_t ry1, uint32_t rid2, int32_t rx2, int32_t ry2) const;
 
     void trigger_error(const std::string& msg);
     void execute_instruction();

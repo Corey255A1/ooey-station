@@ -57,12 +57,16 @@ enum Opcode : uint8_t {
     OP_BTNH     = 0x61,
     OP_SFX      = 0x62,
     OP_PLAY     = 0x63,
+    OP_BTNR     = 0x64,
     
     OP_RND      = 0x70,
     OP_SIN      = 0x71,
     OP_DIST     = 0x72,
     OP_FRAME    = 0x73,
-    OP_EXIT     = 0x74
+    OP_EXIT     = 0x74,
+    OP_COS      = 0x75,
+    OP_ATAN2    = 0x76,
+    OP_ITOA     = 0x77
 };
 
 } // namespace ooey_station::vm

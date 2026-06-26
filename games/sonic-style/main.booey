@@ -1,0 +1,1172 @@
+game:
+    title: "Sonic Station"
+    author: "Antigravity"
+    version: "1.0"
+
+palette:
+    ash_gray: rgb(128, 128, 128)
+    blue: rgb(0, 0, 205)
+    dirt_brown: rgb(139, 69, 19)
+    emerald_green: rgb(34, 139, 34)
+    mountain_gray: rgb(90, 90, 90)
+    red_shoes: rgb(255, 0, 0)
+    sky: rgb(100, 149, 237)
+    white: rgb(255, 255, 255)
+    yellow_gold: rgb(255, 215, 0)
+
+sprites:
+    sonic_idle1 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b w w b b w w b b . . . .
+        . . b b w w b b w w b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b . . . . . . b b . . . .
+        . . b b . . . . . . b b . . . .
+        r r . . . . . . . . . . r r . .
+        r r . . . . . . . . . . r r . .
+
+    sonic_idle2 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b . . . . . . b b . . . .
+        . . b b . . . . . . b b . . . .
+        r r . . . . . . . . . . r r . .
+        r r . . . . . . . . . . r r . .
+
+    sonic_run1 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b w w b b w w b b . . . .
+        . . b b w w b b w w b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . r r . . . . b b . . . .
+        . . . . r r . . . . b b . . . .
+        . . . . . . . . . . r r . . . .
+        . . . . . . . . . . r r . . . .
+
+    sonic_run2 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b w w b b w w b b . . . .
+        . . b b w w b b w w b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b . . . . r r . . . . . .
+        . . b b . . . . r r . . . . . .
+        r r . . . . . . . . . . . . . .
+        r r . . . . . . . . . . . . . .
+
+    sonic_jump1 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . b b b b b b b b . . . . .
+        . . b b b b b b b b b b . . . .
+        . b b b b b b b b b b b b . . .
+        . b b b b b b b b b b b b . . .
+        b b b b b b b b b b b b b b . .
+        b b b b b b b b b b b b b b . .
+        b b b b b b b b b b b b b b . .
+        b b b r r b b b b b r r b b . .
+        . b b r r b b b b b r r b . . .
+        . b b b b b b b b b b b b . . .
+        . . b b b b b b b b b b . . . .
+        . . . b b b b b b b b . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+
+    sonic_jump2 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . b b b b b b b b . . . . .
+        . . b b b b b b b b b b . . . .
+        . b b b b b b b b b b b b . . .
+        . b b b b b b b b b b b b . . .
+        b b b b b b b b b b b b b b . .
+        b b b b b b b b b b b b b b . .
+        b b b r r b b b b b r r b b . .
+        b b b r r b b b b b r r b b . .
+        . b b b b b b b b b b b b . . .
+        . b b b b b b b b b b b b . . .
+        . . b b b b b b b b b b . . . .
+        . . . b b b b b b b b . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+
+    sonic_goal1 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b w w b b w w b b . . . .
+        . . b b w w b b w w b b . . . .
+        w w b b b b b b b b b b . . . .
+        w w b b b b b b b b b b . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b . . . . . . b b . . . .
+        . . b b . . . . . . b b . . . .
+        r r . . . . . . . . . . r r . .
+        r r . . . . . . . . . . r r . .
+
+    sonic_goal2 16x16:
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b w w b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        . . b b b b b b b b b b . . . .
+        w w b b b b b b b b b b . . . .
+        w w b b b b b b b b b b . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . r r b b r r . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . . . b b b b b b . . . . . .
+        . . b b . . . . . . b b . . . .
+        . . b b . . . . . . b b . . . .
+        r r . . . . . . . . . . r r . .
+        r r . . . . . . . . . . r r . .
+
+    ring 16x16:
+        . . . . y y y y y y y y . . . .
+        . . . . y y y y y y y y . . . .
+        . . y y y y . . . . y y y y . .
+        . . y y y y . . . . y y y y . .
+        y y y y . . . . . . . . y y y y
+        y y y y . . . . . . . . y y y y
+        y y y y . . . . . . . . y y y y
+        y y y y . . . . . . . . y y y y
+        y y y y . . . . . . . . y y y y
+        y y y y . . . . . . . . y y y y
+        y y y y . . . . . . . . y y y y
+        y y y y . . . . . . . . y y y y
+        . . y y y y . . . . y y y y . .
+        . . y y y y . . . . y y y y . .
+        . . . . y y y y y y y y . . . .
+        . . . . y y y y y y y y . . . .
+
+    baddy 16x16:
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a r r a a r r a a . . . .
+        . . a a r r a a r r a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a a a a a a a a a . . . .
+        . . a a . . . . . . a a . . . .
+        . . a a . . . . . . a a . . . .
+        a a . . . . . . . . . . a a . .
+        a a . . . . . . . . . . a a . .
+
+    flag 16x16:
+        . . . . w w w w w w w w . . . .
+        . . . . w w w w w w w w . . . .
+        . . w w r r r r r r r r w w . .
+        . . w w r r r r r r r r w w . .
+        . . w w r r r r r r r r w w . .
+        . . w w r r r r r r r r w w . .
+        . . . . w w w w w w w w . . . .
+        . . . . w w w w w w w w . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+
+    flag_spin1 16x16:
+        . . . . . . w w w w . . . . . .
+        . . . . . . w w w w . . . . . .
+        . . . . w w r r r r w w . . . .
+        . . . . w w r r r r w w . . . .
+        . . . . w w r r r r w w . . . .
+        . . . . w w r r r r w w . . . .
+        . . . . . . w w w w . . . . . .
+        . . . . . . w w w w . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+
+    flag_spin2 16x16:
+        . . . . . . . w w . . . . . . .
+        . . . . . . . w w . . . . . . .
+        . . . . . . w r r w . . . . . .
+        . . . . . . w r r w . . . . . .
+        . . . . . . w r r w . . . . . .
+        . . . . . . w r r w . . . . . .
+        . . . . . . . w w . . . . . . .
+        . . . . . . . w w . . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+        . . . . . . y y y y . . . . . .
+
+tiles:
+    cloud 16x16:
+        . . . . w w w w w w w w . . . .
+        . . . . w w w w w w w w . . . .
+        . . w w w w w w w w w w w w . .
+        . . w w w w w w w w w w w w . .
+        w w w w w w w w w w w w w w w w
+        w w w w w w w w w w w w w w w w
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+
+    mountain 16x16:
+        . . . . . . m m . . . . . . . .
+        . . . . . . m m . . . . . . . .
+        . . . . m m m m m m . . . . . .
+        . . . . m m m m m m . . . . . .
+        . . m m m m m m m m m m . . . .
+        . . m m m m m m m m m m . . . .
+        m m m m m m m m m m m m m m . .
+        m m m m m m m m m m m m m m . .
+        m m m m m m m m m m m m m m m m
+        m m m m m m m m m m m m m m m m
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+        . . . . . . . . . . . . . . . .
+
+    grass 16x16:
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+        e e e e e e e e e e e e e e e e
+
+    dirt 16x16:
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+        d d d d d d d d d d d d d d d d
+
+vars:
+    # Game state variables
+    score: int = 0
+    rings: int = 0
+    lives: int = 3
+    level: int = 1
+    game_over: int = 0
+    victory: int = 0
+    frame_cnt: int = 0
+    level_goal: int = 2400
+
+    # Player variables (16.16 fixed-point)
+    px: int = 6553600
+    py: int = 19660800
+    vx: int = 0
+    vy: int = 0
+    grounded: int = 0
+    dir: int = 0
+    hurt_timer: int = 0
+
+    # Camera scroll
+    camera_x: int = 0
+    camera_y: int = 0
+
+    # Flag/Goal variables
+    sign_x: int = 2400
+    sign_y: int = 336
+    sign_rot: int = 0
+
+    # Ring variables (Y coordinates float dynamically using sin)
+    r1_x: int = 400
+    r1_y: int = 300
+    r1_base_y: int = 300
+    r1_collected: int = 0
+    r2_x: int = 450
+    r2_y: int = 300
+    r2_base_y: int = 300
+    r2_collected: int = 0
+    r3_x: int = 700
+    r3_y: int = 260
+    r3_base_y: int = 260
+    r3_collected: int = 0
+    r4_x: int = 750
+    r4_y: int = 260
+    r4_base_y: int = 260
+    r4_collected: int = 0
+    r5_x: int = 1200
+    r5_y: int = 230
+    r5_base_y: int = 230
+    r5_collected: int = 0
+    r6_x: int = 1250
+    r6_y: int = 230
+    r6_base_y: int = 230
+    r6_collected: int = 0
+    r7_x: int = 1800
+    r7_y: int = 330
+    r7_base_y: int = 330
+    r7_collected: int = 0
+    r8_x: int = 1850
+    r8_y: int = 330
+    r8_base_y: int = 330
+    r8_collected: int = 0
+
+    # Baddies (Motobugs)
+    b1_x: int = 550
+    b1_y: int = 304
+    b1_start: int = 500
+    b1_end: int = 750
+    b1_dir: int = 0
+    b1_alive: int = 1
+
+    b2_x: int = 950
+    b2_y: int = 336
+    b2_start: int = 850
+    b2_end: int = 1050
+    b2_dir: int = 0
+    b2_alive: int = 1
+
+    b3_x: int = 1250
+    b3_y: int = 272
+    b3_start: int = 1150
+    b3_end: int = 1350
+    b3_dir: int = 0
+    b3_alive: int = 1
+
+    # Temporary and loop variables declared globally
+    tx: int = 0
+    is_gap: int = 0
+    cur_x: int = 0
+    ground_y: int = 0
+    in_gap: int = 0
+    is_on_platform: int = 0
+    py_int: int = 0
+    p_x_int: int = 0
+    draw_px: int = 0
+    draw_py: int = 0
+    draw_player: int = 0
+    ring_offset: int = 0
+    ty: int = 0
+    cur_y_row: int = 0
+    cur_sprite: int = 0
+    goal_timer: int = 0
+    cur_flag_sprite: int = 0
+
+fn build_sky():
+    # Fill sky layer (empty space)
+    cls(sky)
+
+fn build_clouds():
+    tx = 0
+    while tx < 200:
+        tile(0, tx, 2, cloud)
+        tile(0, tx + 1, 2, cloud)
+        tile(0, tx + 5, 4, cloud)
+        tile(0, tx + 6, 4, cloud)
+        tx = tx + 12
+
+fn build_mountains():
+    tx = 0
+    while tx < 200:
+        tile(1, tx, 15, mountain)
+        tile(1, tx + 1, 15, mountain)
+        tile(1, tx + 4, 15, mountain)
+        tx = tx + 8
+
+fn build_foreground():
+    tx = 0
+    while tx < 200:
+        ty = 22 # Default row (snap Y = 336)
+        is_gap = 0
+        
+        if level == 1:
+            # Elevation changes for Level 1
+            if tx >= 30:
+                if tx <= 50:
+                    ty = 20 # Step up (snap Y = 304)
+            if tx >= 70:
+                if tx <= 90:
+                    ty = 18 # Step up (snap Y = 272)
+            if tx >= 110:
+                if tx <= 130:
+                    ty = 24 # Valley (snap Y = 368)
+
+        if level == 2:
+            # Elevation changes for Level 2
+            if tx >= 40:
+                if tx <= 60:
+                    ty = 18 # Hill 1 (snap Y = 272)
+            if tx >= 80:
+                if tx <= 100:
+                    ty = 20 # Hill 2 (snap Y = 304)
+            if tx >= 120:
+                if tx <= 140:
+                    ty = 16 # Hill 3 (snap Y = 240)
+
+        if level == 3:
+            # Pits/gaps
+            if tx >= 50:
+                if tx <= 60:
+                    is_gap = 1
+            if tx >= 100:
+                if tx <= 110:
+                    is_gap = 1
+            # Elevation changes
+            if tx >= 30:
+                if tx <= 49:
+                    ty = 19 # Hill 1 (snap Y = 288)
+            if tx >= 61:
+                if tx <= 80:
+                    ty = 18 # Hill 2 (snap Y = 272)
+            if tx >= 120:
+                if tx <= 150:
+                    ty = 20 # Hill 3 (snap Y = 304)
+
+        if is_gap == 0:
+            tile(2, tx, ty, grass)
+            cur_y_row = ty + 1
+            while cur_y_row < 30:
+                tile(2, tx, cur_y_row, dirt)
+                cur_y_row = cur_y_row + 1
+        tx = tx + 1
+
+fn load_level():
+    build_sky()
+    build_clouds()
+    build_mountains()
+    build_foreground()
+
+    # Reset player
+    px = 100 * 65536
+    py = 300 * 65536
+    vx = 0
+    vy = 0
+    grounded = 0
+    hurt_timer = 0
+    cur_sprite = sonic_idle1
+    goal_timer = 0
+    cur_flag_sprite = flag
+
+    # Reset baddy alive states and set their level-specific Y and X values
+    b1_alive = 1
+    b2_alive = 1
+    b3_alive = 1
+    
+    if level == 1:
+        b1_y = 304
+        b1_x = 500
+        b1_start = 500
+        b1_end = 750
+        b2_y = 336
+        b2_x = 850
+        b2_start = 850
+        b2_end = 1050
+        b3_y = 272
+        b3_x = 1150
+        b3_start = 1150
+        b3_end = 1350
+        
+    if level == 2:
+        b1_y = 272
+        b1_x = 650
+        b1_start = 650
+        b1_end = 900
+        b2_y = 304
+        b2_x = 1300
+        b2_start = 1300
+        b2_end = 1550
+        b3_y = 240
+        b3_x = 1950
+        b3_start = 1950
+        b3_end = 2200
+
+    if level == 3:
+        b1_y = 288
+        b1_x = 500
+        b1_start = 500
+        b1_end = 750
+        b2_y = 272
+        b2_x = 1000
+        b2_start = 1000
+        b2_end = 1250
+        b3_y = 304
+        b3_x = 2000
+        b3_start = 2000
+        b3_end = 2300
+
+    # Reset ring collected states and positions
+    r1_collected = 0
+    r2_collected = 0
+    r3_collected = 0
+    r4_collected = 0
+    r5_collected = 0
+    r6_collected = 0
+    r7_collected = 0
+    r8_collected = 0
+
+    if level == 1:
+        r1_x = 400
+        r1_base_y = 300
+        r2_x = 450
+        r2_base_y = 300
+        r3_x = 600
+        r3_base_y = 260
+        r4_x = 650
+        r4_base_y = 260
+        r5_x = 1200
+        r5_base_y = 230
+        r6_x = 1250
+        r6_base_y = 230
+        r7_x = 1800
+        r7_base_y = 330
+        r8_x = 1850
+        r8_base_y = 330
+
+    if level == 2:
+        r1_x = 400
+        r1_base_y = 300
+        r2_x = 450
+        r2_base_y = 300
+        r3_x = 750
+        r3_base_y = 230
+        r4_x = 800
+        r4_base_y = 230
+        r5_x = 1400
+        r5_base_y = 260
+        r6_x = 1450
+        r6_base_y = 260
+        r7_x = 2000
+        r7_base_y = 200
+        r8_x = 2050
+        r8_base_y = 200
+
+    if level == 3:
+        r1_x = 400
+        r1_base_y = 250
+        r2_x = 440
+        r2_base_y = 250
+        r3_x = 700
+        r3_base_y = 230
+        r4_x = 740
+        r4_base_y = 230
+        r5_x = 1300
+        r5_base_y = 260
+        r6_x = 1350
+        r6_base_y = 260
+        r7_x = 2100
+        r7_base_y = 260
+        r8_x = 2150
+        r8_base_y = 260
+
+    # Determine goal position
+    if level == 1:
+        level_goal = 2000
+    if level == 2:
+        level_goal = 2400
+    if level == 3:
+        level_goal = 2800
+
+    sign_x = level_goal
+    sign_y = 336
+
+fn init():
+    score = 0
+    rings = 0
+    lives = 3
+    level = 1
+    game_over = 0
+    victory = 0
+    load_level()
+
+fn kill_player():
+    lives = lives - 1
+    play(0, 200, 400, 4) # Hurt noise
+    if lives <= 0:
+        game_over = 1
+    else:
+        load_level()
+
+fn get_hurt():
+    if rings > 0:
+        rings = 0
+        hurt_timer = 60 # 60 frames invincibility
+        vy = -262144 # knockback upward
+        vx = -196608
+        play(0, 150, 300, 4)
+    else:
+        kill_player()
+
+fn update_physics():
+    if goal_timer > 0:
+        # Decelerate / stop movement during victory sequence
+        if vx > 0:
+            vx = vx - 8192
+            if vx < 0:
+                vx = 0
+        else:
+            if vx < 0:
+                vx = vx + 8192
+                if vx > 0:
+                    vx = 0
+    else:
+        # Apply input acceleration
+        if btn_held(LEFT):
+            vx = vx - 16384 # Acceleration
+            dir = 1
+        else:
+            if btn_held(RIGHT):
+                vx = vx + 16384
+                dir = 0
+            else:
+                # Deceleration/friction
+                if vx > 0:
+                    vx = vx - 8192
+                    if vx < 0:
+                        vx = 0
+                else:
+                    if vx < 0:
+                        vx = vx + 8192
+                        if vx > 0:
+                            vx = 0
+
+    # Clamp horizontal velocity (-6.0 to 6.0 pixels/frame)
+    vx = clamp(vx, -393216, 393216)
+
+    # Apply gravity
+    vy = vy + 19660 # Gravity acceleration
+    # Clamp fall velocity
+    vy = min(vy, 786432)
+
+    # Jump input
+    if goal_timer == 0:
+        if btn_pressed(A):
+            if grounded == 1:
+                vy = -524288 # Jump velocity
+                grounded = 0
+                play(0, 600, 150, 2) # Play jump sound (sawtooth wave)
+
+    # Store old px
+    tx = px
+
+    # Update position
+    px = px + vx
+    py = py + vy
+
+    # Bounding level boundaries
+    if px < 0:
+        px = 0
+        vx = 0
+
+    # Calculate ground height based on Level and position
+    cur_x = px / 65536
+    ground_y = 336 * 65536 # Default snap Y
+    in_gap = 0
+    is_on_platform = 0
+
+    if level == 1:
+        # Step 1
+        if cur_x >= 480:
+            if cur_x <= 800:
+                ground_y = 304 * 65536
+                is_on_platform = 1
+        # Step 2
+        if cur_x >= 1120:
+            if cur_x <= 1440:
+                ground_y = 272 * 65536
+                is_on_platform = 1
+        # Valley
+        if cur_x >= 1760:
+            if cur_x <= 2080:
+                ground_y = 368 * 65536
+
+    if level == 2:
+        # Hill 1
+        if cur_x >= 640:
+            if cur_x <= 960:
+                ground_y = 272 * 65536
+                is_on_platform = 1
+        # Hill 2
+        if cur_x >= 1280:
+            if cur_x <= 1600:
+                ground_y = 304 * 65536
+                is_on_platform = 1
+        # Hill 3
+        if cur_x >= 1920:
+            if cur_x <= 2240:
+                ground_y = 240 * 65536
+                is_on_platform = 1
+
+    if level == 3:
+        # Hill 1
+        if cur_x >= 480:
+            if cur_x <= 784:
+                ground_y = 288 * 65536
+        # Hill 2
+        if cur_x >= 976:
+            if cur_x <= 1280:
+                ground_y = 272 * 65536
+        # Hill 3
+        if cur_x >= 1920:
+            if cur_x <= 2400:
+                ground_y = 304 * 65536
+        # Gap 1
+        if cur_x >= 800:
+            if cur_x <= 960:
+                in_gap = 1
+        # Gap 2
+        if cur_x >= 1600:
+            if cur_x <= 1760:
+                in_gap = 1
+
+    if in_gap == 1:
+        ground_y = 1000 * 65536
+
+    # Re-evaluate wall collision:
+    # if new ground_y is higher than current py (meaning player is below the new ground level)
+    # and the difference is > 8 pixels (524288 in fixed-point)
+    if py > ground_y + 524288:
+        # Revert px and vx
+        px = tx
+        vx = 0
+        cur_x = px / 65536
+        
+        # Recalculate ground Y for the reverted px
+        ground_y = 336 * 65536
+        
+        if level == 1:
+            if cur_x >= 480:
+                if cur_x <= 800:
+                    ground_y = 304 * 65536
+            if cur_x >= 1120:
+                if cur_x <= 1440:
+                    ground_y = 272 * 65536
+            if cur_x >= 1760:
+                if cur_x <= 2080:
+                    ground_y = 368 * 65536
+
+        if level == 2:
+            if cur_x >= 640:
+                if cur_x <= 960:
+                    ground_y = 272 * 65536
+            if cur_x >= 1280:
+                if cur_x <= 1600:
+                    ground_y = 304 * 65536
+            if cur_x >= 1920:
+                if cur_x <= 2240:
+                    ground_y = 240 * 65536
+
+        if level == 3:
+            if cur_x >= 480:
+                if cur_x <= 784:
+                    ground_y = 288 * 65536
+            if cur_x >= 976:
+                if cur_x <= 1280:
+                    ground_y = 272 * 65536
+            if cur_x >= 1920:
+                if cur_x <= 2400:
+                    ground_y = 304 * 65536
+
+    # Ground collision
+    if py >= ground_y:
+        py = ground_y
+        vy = 0
+        grounded = 1
+    else:
+        grounded = 0
+
+    py_int = py / 65536
+
+    # Die when falling past screen bottom
+    if py_int > 440:
+        kill_player()
+
+fn update_baddies():
+    # Baddy 1
+    if b1_alive == 1:
+        if b1_dir == 0:
+            b1_x = b1_x + 2
+            if b1_x >= b1_end:
+                b1_dir = 1
+        else:
+            b1_x = b1_x - 2
+            if b1_x <= b1_start:
+                b1_dir = 0
+        
+        # Check collision
+        if check_collision(cur_sprite, px / 65536, py / 65536, baddy, b1_x, b1_y) == 1:
+            if vy > 0:
+                # Defeat baddy
+                b1_alive = 0
+                vy = -262144 # bounce up
+                score = score + 200
+                play(0, 400, 100, 1) # score beep
+            else:
+                if hurt_timer == 0:
+                    get_hurt()
+
+    # Baddy 2
+    if b2_alive == 1:
+        if b2_dir == 0:
+            b2_x = b2_x + 2
+            if b2_x >= b2_end:
+                b2_dir = 1
+        else:
+            b2_x = b2_x - 2
+            if b2_x <= b2_start:
+                b2_dir = 0
+        
+        if check_collision(cur_sprite, px / 65536, py / 65536, baddy, b2_x, b2_y) == 1:
+            if vy > 0:
+                b2_alive = 0
+                vy = -262144
+                score = score + 200
+                play(0, 400, 100, 1)
+            else:
+                if hurt_timer == 0:
+                    get_hurt()
+
+    # Baddy 3
+    if b3_alive == 1:
+        if b3_dir == 0:
+            b3_x = b3_x + 2
+            if b3_x >= b3_end:
+                b3_dir = 1
+        else:
+            b3_x = b3_x - 2
+            if b3_x <= b3_start:
+                b3_dir = 0
+        
+        if check_collision(cur_sprite, px / 65536, py / 65536, baddy, b3_x, b3_y) == 1:
+            if vy > 0:
+                b3_alive = 0
+                vy = -262144
+                score = score + 200
+                play(0, 400, 100, 1)
+            else:
+                if hurt_timer == 0:
+                    get_hurt()
+
+fn update_rings():
+    # Use fixed-point sine wave to float rings up and down
+    # angle = frame_cnt * 1000 in fixed-point
+    ring_offset = sin(frame_cnt * 1000) * 8 / 65536
+
+    # Ring 1
+    if r1_collected == 0:
+        r1_y = r1_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r1_x, r1_y) == 1:
+            r1_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3) # ring jingle (sine wave)
+    
+    # Ring 2
+    if r2_collected == 0:
+        r2_y = r2_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r2_x, r2_y) == 1:
+            r2_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3)
+
+    # Ring 3
+    if r3_collected == 0:
+        r3_y = r3_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r3_x, r3_y) == 1:
+            r3_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3)
+
+    # Ring 4
+    if r4_collected == 0:
+        r4_y = r4_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r4_x, r4_y) == 1:
+            r4_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3)
+
+    # Ring 5
+    if r5_collected == 0:
+        r5_y = r5_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r5_x, r5_y) == 1:
+            r5_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3)
+
+    # Ring 6
+    if r6_collected == 0:
+        r6_y = r6_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r6_x, r6_y) == 1:
+            r6_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3)
+
+    # Ring 7
+    if r7_collected == 0:
+        r7_y = r7_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r7_x, r7_y) == 1:
+            r7_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3)
+
+    # Ring 8
+    if r8_collected == 0:
+        r8_y = r8_base_y + ring_offset
+        if check_collision(cur_sprite, px / 65536, py / 65536, ring, r8_x, r8_y) == 1:
+            r8_collected = 1
+            rings = rings + 1
+            score = score + 100
+            play(0, 900, 80, 3)
+
+fn draw_hud():
+    draw_text(10, 10, "SCORE:", white)
+    draw_int(65, 10, score, white)
+
+    draw_text(10, 22, "RINGS:", white)
+    draw_int(65, 22, rings, white)
+
+    draw_text(10, 34, "LIVES:", white)
+    draw_int(65, 34, lives, white)
+
+    draw_text(10, 46, "LEVEL:", white)
+    draw_int(65, 46, level, white)
+
+fn update():
+    # 1. Check game over or victory screens
+    if game_over == 1:
+        cls(sky)
+        draw_text(260, 200, "GAME OVER", white)
+        draw_text(220, 240, "PRESS START TO RESTART", white)
+        if btn_pressed(START):
+            init()
+        return
+
+    if victory == 1:
+        cls(sky)
+        draw_text(270, 180, "VICTORY!", white)
+        draw_text(240, 210, "YOU COMPLETED THE GAME", white)
+        draw_text(190, 240, "TOTAL SCORE:", white)
+        draw_int(300, 240, score, white)
+        draw_text(210, 280, "PRESS START TO REPLAY", white)
+        if btn_pressed(START):
+            init()
+        return
+
+    # Update timers
+    frame_cnt = frame()
+    if hurt_timer > 0:
+        hurt_timer = hurt_timer - 1
+
+    # 2. Physics & Gameplay updates
+    update_physics()
+    update_baddies()
+    update_rings()
+
+    # Check goal flag sign post collision or update goal sequence
+    if goal_timer > 0:
+        goal_timer = goal_timer - 1
+        
+        # Spin signpost: cycle frames every 4 frames
+        if (frame_cnt % 12) < 4:
+            cur_flag_sprite = flag
+        else:
+            if (frame_cnt % 12) < 8:
+                cur_flag_sprite = flag_spin1
+            else:
+                cur_flag_sprite = flag_spin2
+
+        if goal_timer == 0:
+            level = level + 1
+            if level > 3:
+                victory = 1
+            else:
+                load_level()
+            return
+    else:
+        # Check goal flag sign post collision
+        if check_collision(cur_sprite, px / 65536, py / 65536, flag, sign_x, sign_y) == 1:
+            goal_timer = 90
+            cur_flag_sprite = flag
+            # Play victory chime
+            play(0, 500, 100, 3)
+            play(0, 650, 100, 3)
+            play(0, 800, 250, 3)
+
+    # Update camera scroll (keeps player centered, clamped to level end)
+    p_x_int = px / 65536
+    camera_x = p_x_int - 320
+    camera_x = clamp(camera_x, 0, level_goal - 320)
+
+    # 3. Drawing commands
+    # Background sky
+    cls(sky)
+
+    # Parallax Background scrolling
+    # Layer 0 (Clouds) scrolls at 25% camera speed
+    tscroll(0, camera_x / 4, 0)
+    tdraw(0)
+
+    # Layer 1 (Mountains) scrolls at 50% camera speed
+    tscroll(1, camera_x / 2, 0)
+    tdraw(1)
+
+    # Layer 2 (Playfield Foreground) scrolls at 100% camera speed
+    tscroll(2, camera_x, 0)
+    tdraw(2)
+
+    # Offset drawing coordinates relative to camera scroll
+    draw_px = p_x_int - camera_x
+    draw_py = (py / 65536) - camera_y
+
+    # Draw Signpost
+    draw_sprite(cur_flag_sprite, sign_x - camera_x, sign_y - camera_y)
+
+    # Draw Active Rings
+    if r1_collected == 0:
+        draw_sprite(ring, r1_x - camera_x, r1_y - camera_y)
+    if r2_collected == 0:
+        draw_sprite(ring, r2_x - camera_x, r2_y - camera_y)
+    if r3_collected == 0:
+        draw_sprite(ring, r3_x - camera_x, r3_y - camera_y)
+    if r4_collected == 0:
+        draw_sprite(ring, r4_x - camera_x, r4_y - camera_y)
+    if r5_collected == 0:
+        draw_sprite(ring, r5_x - camera_x, r5_y - camera_y)
+    if r6_collected == 0:
+        draw_sprite(ring, r6_x - camera_x, r6_y - camera_y)
+    if r7_collected == 0:
+        draw_sprite(ring, r7_x - camera_x, r7_y - camera_y)
+    if r8_collected == 0:
+        draw_sprite(ring, r8_x - camera_x, r8_y - camera_y)
+
+    # Draw Active Baddies
+    if b1_alive == 1:
+        draw_sprite(baddy, b1_x - camera_x, b1_y - camera_y)
+    if b2_alive == 1:
+        draw_sprite(baddy, b2_x - camera_x, b2_y - camera_y)
+    if b3_alive == 1:
+        draw_sprite(baddy, b3_x - camera_x, b3_y - camera_y)
+
+    # Update player sprite animation frame
+    if goal_timer > 0:
+        # Goal/victory pose: alternate pose frames
+        if (frame_cnt % 20) < 10:
+            cur_sprite = sonic_goal1
+        else:
+            cur_sprite = sonic_goal2
+    else:
+        if grounded == 0:
+            # Jumping animation: alternate jump frames
+            if (frame_cnt % 8) < 4:
+                cur_sprite = sonic_jump1
+            else:
+                cur_sprite = sonic_jump2
+        else:
+            if vx != 0:
+                # Running animation: alternate run frames
+                if (frame_cnt % 8) < 4:
+                    cur_sprite = sonic_run1
+                else:
+                    cur_sprite = sonic_run2
+            else:
+                # Idle animation: alternate idle frames
+                if (frame_cnt % 30) < 15:
+                    cur_sprite = sonic_idle1
+                else:
+                    cur_sprite = sonic_idle2
+
+    # Draw Player (flickers if invincibly hurt, faces direction)
+    draw_player = 1
+    if hurt_timer > 0:
+        # Modulo check using our new OP_MOD (%) support!
+        if (frame_cnt % 4) < 2:
+            draw_player = 0
+
+    if draw_player == 1:
+        # draw_sprite_ex allows horizontal flipping (flag = 1)
+        if dir == 1:
+            draw_sprite_ex(cur_sprite, draw_px, draw_py, 1) # Flip horizontally
+        else:
+            draw_sprite_ex(cur_sprite, draw_px, draw_py, 0) # Normal
+
+    # Draw overlay HUD
+    draw_hud()

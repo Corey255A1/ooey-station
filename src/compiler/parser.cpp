@@ -493,7 +493,7 @@ std::unique_ptr<ExpressionNode> Parser::parse_term() {
 
 std::unique_ptr<ExpressionNode> Parser::parse_factor() {
     auto expr = parse_unary();
-    while (match(TokenType::Star) || match(TokenType::Slash)) {
+    while (match(TokenType::Star) || match(TokenType::Slash) || match(TokenType::Percent)) {
         std::string op = previous().value;
         auto right = parse_unary();
         expr = std::make_unique<BinaryOpNode>(op, std::move(expr), std::move(right));

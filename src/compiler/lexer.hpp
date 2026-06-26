@@ -18,7 +18,7 @@ enum class TokenType {
     Identifier, IntLiteral, FixedLiteral, StringLiteral,
     
     // Operators
-    Plus, Minus, Star, Slash, Equals, EqualsEquals, 
+    Plus, Minus, Star, Slash, Percent, Equals, EqualsEquals, 
     NotEquals, LessThan, GreaterThan, LessEqual, GreaterEqual,
     
     // Punctuation

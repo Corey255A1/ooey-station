@@ -155,6 +155,7 @@ Token Lexer::scan_token() {
         case '-': return make_token(TokenType::Minus, "-");
         case '*': return make_token(TokenType::Star, "*");
         case '/': return make_token(TokenType::Slash, "/");
+        case '%': return make_token(TokenType::Percent, "%");
         
         case '=':
             if (peek() == '=') {

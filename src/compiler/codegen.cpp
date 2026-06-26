@@ -195,6 +195,10 @@ void Codegen::visit(BinaryOpNode* node) {
         emit_8(vm::OP_DIV);
         emit_8(r_left);
         emit_8(r_right);
+    } else if (node->op == "%") {
+        emit_8(vm::OP_MOD);
+        emit_8(r_left);
+        emit_8(r_right);
     } else if (node->op == "==") {
         emit_8(vm::OP_CMP);
         emit_8(r_left);
@@ -213,6 +217,24 @@ void Codegen::visit(BinaryOpNode* node) {
         emit_32(1);
         
         patch_32(fixup_jz + 1, code_buf_.size());
+    } else if (node->op == "!=") {
+        emit_8(vm::OP_CMP);
+        emit_8(r_left);
+        emit_8(r_right);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(0);
+        
+        size_t fixup_jz = code_buf_.size();
+        emit_8(vm::OP_JZ); // If equal, skip
+        emit_32(0);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(1);
+        
+        patch_32(fixup_jz + 1, code_buf_.size());
     } else if (node->op == "<") {
         emit_8(vm::OP_CMP);
         emit_8(r_left);
@@ -222,8 +244,8 @@ void Codegen::visit(BinaryOpNode* node) {
         emit_8(r_left);
         emit_32(0);
         
-        size_t fixup_jge = code_buf_.size();
-        emit_8(vm::OP_JZ); // If equal (not less), skip
+        size_t fixup_jz = code_buf_.size();
+        emit_8(vm::OP_JZ); // If equal, skip
         emit_32(0);
         
         size_t fixup_jg = code_buf_.size();
@@ -234,8 +256,67 @@ void Codegen::visit(BinaryOpNode* node) {
         emit_8(r_left);
         emit_32(1);
         
-        patch_32(fixup_jge + 1, code_buf_.size());
+        patch_32(fixup_jz + 1, code_buf_.size());
         patch_32(fixup_jg + 1, code_buf_.size());
+    } else if (node->op == "<=") {
+        emit_8(vm::OP_CMP);
+        emit_8(r_left);
+        emit_8(r_right);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(0);
+        
+        size_t fixup_jg = code_buf_.size();
+        emit_8(vm::OP_JG); // If greater, skip
+        emit_32(0);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(1);
+        
+        patch_32(fixup_jg + 1, code_buf_.size());
+    } else if (node->op == ">") {
+        emit_8(vm::OP_CMP);
+        emit_8(r_left);
+        emit_8(r_right);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(0);
+        
+        size_t fixup_jz = code_buf_.size();
+        emit_8(vm::OP_JZ); // If equal, skip
+        emit_32(0);
+        
+        size_t fixup_jl = code_buf_.size();
+        emit_8(vm::OP_JL); // If less, skip
+        emit_32(0);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(1);
+        
+        patch_32(fixup_jz + 1, code_buf_.size());
+        patch_32(fixup_jl + 1, code_buf_.size());
+    } else if (node->op == ">=") {
+        emit_8(vm::OP_CMP);
+        emit_8(r_left);
+        emit_8(r_right);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(0);
+        
+        size_t fixup_jl = code_buf_.size();
+        emit_8(vm::OP_JL); // If less, skip
+        emit_32(0);
+        
+        emit_8(vm::OP_MOVI);
+        emit_8(r_left);
+        emit_32(1);
+        
+        patch_32(fixup_jl + 1, code_buf_.size());
     }
     
     free_register(r_right);
@@ -424,6 +505,386 @@ void Codegen::visit(FuncCallNode* node) {
         free_register(ry);
         free_register(rx);
         free_register(rid);
+    }
+    else if (node->name == "draw_sprite_ex") {
+        node->args[0]->accept(this);
+        int rid = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rx = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int ry = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int rflags = next_free_register_ - 1;
+        
+        emit_8(vm::OP_SPREX);
+        emit_8(rid);
+        emit_8(rx);
+        emit_8(ry);
+        emit_8(rflags);
+        
+        free_register(rflags);
+        free_register(ry);
+        free_register(rx);
+        free_register(rid);
+    }
+    else if (node->name == "tscroll") {
+        node->args[0]->accept(this);
+        int rl = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rdx = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int rdy = next_free_register_ - 1;
+        
+        emit_8(vm::OP_TSCROLL);
+        emit_8(rl);
+        emit_8(rdx);
+        emit_8(rdy);
+        
+        free_register(rdy);
+        free_register(rdx);
+        free_register(rl);
+    }
+    else if (node->name == "tdraw") {
+        node->args[0]->accept(this);
+        int rl = next_free_register_ - 1;
+        
+        emit_8(vm::OP_TDRAW);
+        emit_8(rl);
+        
+        free_register(rl);
+    }
+    else if (node->name == "tile") {
+        node->args[0]->accept(this);
+        int rl = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rtx = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int rty = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int rtid = next_free_register_ - 1;
+        
+        emit_8(vm::OP_TILE);
+        emit_8(rl);
+        emit_8(rtx);
+        emit_8(rty);
+        emit_8(rtid);
+        
+        free_register(rtid);
+        free_register(rty);
+        free_register(rtx);
+        free_register(rl);
+    }
+    else if (node->name == "frame") {
+        int rd = allocate_register();
+        emit_8(vm::OP_FRAME);
+        emit_8(rd);
+    }
+    else if (node->name == "sfx") {
+        node->args[0]->accept(this);
+        int rid = next_free_register_ - 1;
+        
+        emit_8(vm::OP_SFX);
+        emit_8(rid);
+        
+        free_register(rid);
+    }
+    else if (node->name == "play") {
+        node->args[0]->accept(this);
+        int rch = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rfreq = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int rdur = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int rwave = next_free_register_ - 1;
+        
+        emit_8(vm::OP_PLAY);
+        emit_8(rch);
+        emit_8(rfreq);
+        emit_8(rdur);
+        emit_8(rwave);
+        
+        free_register(rwave);
+        free_register(rdur);
+        free_register(rfreq);
+        free_register(rch);
+    }
+    else if (node->name == "btn_released") {
+        node->args[0]->accept(this);
+        int rbtn = next_free_register_ - 1;
+        int rd = allocate_register();
+        emit_8(vm::OP_BTNR);
+        emit_8(rd);
+        emit_8(rbtn);
+        emit_8(vm::OP_MOV);
+        emit_8(rbtn);
+        emit_8(rd);
+        free_register(rd);
+    }
+    else if (node->name == "check_collision") {
+        node->args[0]->accept(this);
+        int rid1 = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rx1 = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int ry1 = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int rid2 = next_free_register_ - 1;
+        node->args[4]->accept(this);
+        int rx2 = next_free_register_ - 1;
+        node->args[5]->accept(this);
+        int ry2 = next_free_register_ - 1;
+        
+        int rd = allocate_register();
+        emit_8(vm::OP_SCOL);
+        emit_8(rd);
+        emit_8(rid1);
+        emit_8(rx1);
+        emit_8(ry1);
+        emit_8(rid2);
+        emit_8(rx2);
+        emit_8(ry2);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(rid1);
+        emit_8(rd);
+        free_register(rd);
+        
+        free_register(ry2);
+        free_register(rx2);
+        free_register(rid2);
+        free_register(ry1);
+        free_register(rx1);
+    }
+    else if (node->name == "draw_int") {
+        node->args[0]->accept(this);
+        int rx = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int ry = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int rval = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int rc = next_free_register_ - 1;
+        
+        int r_addr = allocate_register();
+        emit_8(vm::OP_MOVI);
+        emit_8(r_addr);
+        emit_32(0xFC00); // Temporary buffer in RAM
+        
+        emit_8(vm::OP_ITOA);
+        emit_8(r_addr);
+        emit_8(rval);
+        
+        emit_8(vm::OP_TEXT);
+        emit_8(rx);
+        emit_8(ry);
+        emit_32(0xFC00);
+        emit_8(rc);
+        
+        free_register(r_addr);
+        free_register(rc);
+        free_register(rval);
+        free_register(ry);
+        free_register(rx);
+    }
+    else if (node->name == "abs") {
+        node->args[0]->accept(this);
+        int rx = next_free_register_ - 1;
+        
+        int r_zero = allocate_register();
+        emit_8(vm::OP_MOVI);
+        emit_8(r_zero);
+        emit_32(0);
+        
+        emit_8(vm::OP_CMP);
+        emit_8(rx);
+        emit_8(r_zero);
+        
+        emit_8(vm::OP_JL);
+        size_t jl_patch = code_buf_.size();
+        emit_32(0);
+        
+        emit_8(vm::OP_JMP);
+        size_t jmp_patch = code_buf_.size();
+        emit_32(0);
+        
+        uint32_t negate_addr = code_buf_.size();
+        emit_8(vm::OP_SUB);
+        emit_8(r_zero);
+        emit_8(rx);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(rx);
+        emit_8(r_zero);
+        
+        uint32_t end_addr = code_buf_.size();
+        patch_32(jl_patch, negate_addr);
+        patch_32(jmp_patch, end_addr);
+        
+        free_register(r_zero);
+    }
+    else if (node->name == "min") {
+        node->args[0]->accept(this);
+        int ra = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rb = next_free_register_ - 1;
+        
+        emit_8(vm::OP_CMP);
+        emit_8(ra);
+        emit_8(rb);
+        
+        emit_8(vm::OP_JL);
+        size_t jl_patch = code_buf_.size();
+        emit_32(0);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(ra);
+        emit_8(rb);
+        
+        uint32_t end_addr = code_buf_.size();
+        patch_32(jl_patch, end_addr);
+        
+        free_register(rb);
+    }
+    else if (node->name == "max") {
+        node->args[0]->accept(this);
+        int ra = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rb = next_free_register_ - 1;
+        
+        emit_8(vm::OP_CMP);
+        emit_8(ra);
+        emit_8(rb);
+        
+        emit_8(vm::OP_JG);
+        size_t jg_patch = code_buf_.size();
+        emit_32(0);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(ra);
+        emit_8(rb);
+        
+        uint32_t end_addr = code_buf_.size();
+        patch_32(jg_patch, end_addr);
+        
+        free_register(rb);
+    }
+    else if (node->name == "clamp") {
+        node->args[0]->accept(this);
+        int r_val = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int r_lo = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int r_hi = next_free_register_ - 1;
+        
+        emit_8(vm::OP_CMP);
+        emit_8(r_val);
+        emit_8(r_lo);
+        
+        emit_8(vm::OP_JG);
+        size_t jg_patch = code_buf_.size();
+        emit_32(0);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(r_val);
+        emit_8(r_lo);
+        
+        uint32_t max_end = code_buf_.size();
+        patch_32(jg_patch, max_end);
+        
+        emit_8(vm::OP_CMP);
+        emit_8(r_val);
+        emit_8(r_hi);
+        
+        emit_8(vm::OP_JL);
+        size_t jl_patch = code_buf_.size();
+        emit_32(0);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(r_val);
+        emit_8(r_hi);
+        
+        uint32_t min_end = code_buf_.size();
+        patch_32(jl_patch, min_end);
+        
+        free_register(r_hi);
+        free_register(r_lo);
+    }
+    else if (node->name == "sin") {
+        node->args[0]->accept(this);
+        int rs = next_free_register_ - 1;
+        int rd = allocate_register();
+        
+        emit_8(vm::OP_SIN);
+        emit_8(rd);
+        emit_8(rs);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(rs);
+        emit_8(rd);
+        
+        free_register(rd);
+    }
+    else if (node->name == "cos") {
+        node->args[0]->accept(this);
+        int rs = next_free_register_ - 1;
+        int rd = allocate_register();
+        
+        emit_8(vm::OP_COS);
+        emit_8(rd);
+        emit_8(rs);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(rs);
+        emit_8(rd);
+        
+        free_register(rd);
+    }
+    else if (node->name == "atan2") {
+        node->args[0]->accept(this);
+        int ry = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int rx = next_free_register_ - 1;
+        int rd = allocate_register();
+        
+        emit_8(vm::OP_ATAN2);
+        emit_8(rd);
+        emit_8(ry);
+        emit_8(rx);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(ry);
+        emit_8(rd);
+        
+        free_register(rd);
+        free_register(rx);
+    }
+    else if (node->name == "dist") {
+        node->args[0]->accept(this);
+        int rx1 = next_free_register_ - 1;
+        node->args[1]->accept(this);
+        int ry1 = next_free_register_ - 1;
+        node->args[2]->accept(this);
+        int rx2 = next_free_register_ - 1;
+        node->args[3]->accept(this);
+        int ry2 = next_free_register_ - 1;
+        int rd = allocate_register();
+        
+        emit_8(vm::OP_DIST);
+        emit_8(rd);
+        emit_8(rx1);
+        emit_8(ry1);
+        emit_8(rx2);
+        emit_8(ry2);
+        
+        emit_8(vm::OP_MOV);
+        emit_8(rx1);
+        emit_8(rd);
+        
+        free_register(rd);
+        free_register(ry2);
+        free_register(rx2);
+        free_register(ry1);
     }
     else if (node->name == "line") {
         node->args[0]->accept(this);
@@ -768,8 +1229,8 @@ void Codegen::visit(ProgramNode* node) {
         color_index++;
     }
     
-    // 3. Pack Sprites
-    // Consumes 256 bytes per 16x16 sprite. Let's write them into the asset buffer.
+    // 3. Pack Sprites & Tiles
+    // Consumes bytes per sprite/tile. Let's write them into the asset buffer.
     uint32_t sprite_offset = 256 * 3; // After palette
     asset_buf_.resize(sprite_offset);
     
@@ -785,6 +1246,34 @@ void Codegen::visit(ProgramNode* node) {
         for (int y = 0; y < sprite.height; ++y) {
             for (int x = 0; x < sprite.width; ++x) {
                 char c = sprite.grid[y][x];
+                if (c == '.' || c == ' ') {
+                    asset_buf_.push_back(0); // Transparent
+                } else {
+                    std::string key(1, c);
+                    // Match starting character with palette names
+                    uint8_t index = 0;
+                    for (const auto& [col_name, idx] : color_palette_) {
+                        if (col_name[0] == c) {
+                            index = idx;
+                            break;
+                        }
+                    }
+                    asset_buf_.push_back(index);
+                }
+            }
+        }
+    }
+
+    for (const auto& tile : node->tiles) {
+        tile_ids_[tile.name] = sprite_id++;
+        
+        // We write Tile Header (Width, Height) then pixel indices
+        asset_buf_.push_back(tile.width);
+        asset_buf_.push_back(tile.height);
+        
+        for (int y = 0; y < tile.height; ++y) {
+            for (int x = 0; x < tile.width; ++x) {
+                char c = tile.grid[y][x];
                 if (c == '.' || c == ' ') {
                     asset_buf_.push_back(0); // Transparent
                 } else {

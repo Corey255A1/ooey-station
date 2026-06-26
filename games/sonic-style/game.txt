@@ -1,0 +1,6 @@
+title=Sonic Station
+author=Antigravity
+version=1.0
+description=A retro 2D platformer demonstrating fixed-point physics, parallax scrolling, custom tilemaps, and sound synthesis.
+genre=Platformer
+release_date=2026-06-26

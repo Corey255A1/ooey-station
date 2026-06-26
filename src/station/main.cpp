@@ -3,6 +3,7 @@
 #include <ooey/platform.hpp>
 #include "console/display.hpp"
 #include "console/input.hpp"
+#include "console/audio.hpp"
 #include "vm/vm.hpp"
 #include "station/browser.hpp"
 #include "station/bootloader.hpp"
@@ -157,11 +158,12 @@ int main() {
     BooeyVM vm;
     ConsoleDisplay display;
     InputController input_controller;
+    AudioEngine audio_engine;
 
     bool game_running = false;
     GameInfo active_game;
     
-    // Set up VM callbacks to display
+    // Set up VM callbacks to display and audio
     vm.set_clear_callback([&](uint32_t c) { display.clear(c); });
     vm.set_draw_pixel_callback([&](int x, int y, uint32_t c) { display.set_pixel(x, y, c); });
     vm.set_draw_line_callback([&](int x1, int y1, int x2, int y2, uint32_t c) { display.draw_line(x1, y1, x2, y2, c); });
@@ -179,6 +181,12 @@ int main() {
             str += ch;
         }
         display.draw_text(x, y, str, c);
+    });
+    vm.set_sfx_callback([&](uint32_t id) {
+        audio_engine.play_sfx(id);
+    });
+    vm.set_play_callback([&](uint32_t ch, uint32_t freq, uint32_t dur, uint32_t wave) {
+        audio_engine.play_tone(ch, static_cast<float>(freq), dur, wave);
     });
 
     browser->set_on_launch_game([&](const GameInfo& game) {

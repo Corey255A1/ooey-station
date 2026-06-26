@@ -351,6 +351,7 @@ This overview is the first in a series of detailed design documents. Each docume
 | **08** | Booey Compiler Implementation | Compiler architecture from source to bytecode | Lexer, parser, AST, semantic analysis, code generation |
 | **09** | Asset System (Sprites, Tilemaps, Sound) | Procedural asset definition and management | Sprite sheets, tile definitions, sound instruments, asset encoding |
 | **10** | Game Development Guide & Examples | Tutorial and reference for game authors | "Hello World" game, platformer tutorial, API cookbook, best practices |
+| **11** | Sonic-Style Platformer Guide | Deep-dive into building a complete multi-level high-speed platformer | Physics, state machine, tile collision, cameras, rings, levels, gap analysis |
 
 > [!IMPORTANT]
 > Documents are numbered for reading order, but each is designed to be self-contained. Cross-references between documents use the format `→ See [Doc ##: Section Name]`.

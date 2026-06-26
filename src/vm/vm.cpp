@@ -3,6 +3,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 namespace ooey_station::vm {
 
@@ -11,13 +12,64 @@ BooeyVM::BooeyVM() {
     vram_.resize(32 * 1024, 0);  // 32 KB
     aram_.resize(16 * 1024, 0);  // 16 KB
     mmio_.resize(4 * 1024, 0);   // 4 KB
+    for (auto& layer : tile_layers_) {
+        layer.tiles.resize(256 * 256, 0);
+    }
+}
+
+uint32_t BooeyVM::find_sprite_address(uint32_t sprite_id) const {
+    uint32_t addr = 256 * 3; // Palette takes 768 bytes
+    for (uint32_t i = 0; i < sprite_id; ++i) {
+        if (addr + 1 >= vram_.size()) return 0;
+        uint8_t w = vram_[addr];
+        uint8_t h = vram_[addr + 1];
+        addr += 2 + (w * h);
+    }
+    return addr;
+}
+
+int BooeyVM::get_layer_tile_size(uint32_t layer) const {
+    for (uint16_t tid : tile_layers_[layer].tiles) {
+        if (tid != 0) {
+            uint32_t addr = find_sprite_address(tid);
+            if (addr + 1 < vram_.size()) {
+                uint8_t w = vram_[addr];
+                if (w == 8 || w == 16) return w;
+            }
+        }
+    }
+    return 16; // Default to 16
+}
+
+bool BooeyVM::check_sprite_collision(uint32_t rid1, int32_t rx1, int32_t ry1, uint32_t rid2, int32_t rx2, int32_t ry2) const {
+    uint32_t addr1 = find_sprite_address(rid1);
+    uint32_t addr2 = find_sprite_address(rid2);
+    
+    if (addr1 + 1 >= vram_.size() || addr2 + 1 >= vram_.size()) return false;
+    
+    int32_t w1 = vram_[addr1];
+    int32_t h1 = vram_[addr1 + 1];
+    int32_t w2 = vram_[addr2];
+    int32_t h2 = vram_[addr2 + 1];
+    
+    if (w1 == 0 || h1 == 0 || w2 == 0 || h2 == 0) return false;
+    
+    return (rx1 < rx2 + w2) && (rx1 + w1 > rx2) && (ry1 < ry2 + h2) && (ry1 + h1 > ry2);
 }
 
 void BooeyVM::reset() {
     std::fill(ram_.begin(), ram_.end(), 0);
     std::fill(vram_.begin(), vram_.end(), 0);
     std::fill(aram_.begin(), aram_.end(), 0);
-    std::fill(mmio_.begin(), mmio_.end(), 0);
+    
+    // Clear only non-save MMIO registers (0x00 to 0x1F)
+    std::fill(mmio_.begin(), mmio_.begin() + 0x20, 0);
+    
+    for (auto& layer : tile_layers_) {
+        std::fill(layer.tiles.begin(), layer.tiles.end(), 0);
+        layer.scroll_x = 0;
+        layer.scroll_y = 0;
+    }
     
     // Copy initial static data into Game RAM (starting at 0x0000)
     if (!static_data_.empty()) {
@@ -530,6 +582,100 @@ void BooeyVM::execute_instruction() {
             if (draw_sprite_callback_) draw_sprite_callback_(registers_[rid], registers_[rx], registers_[ry], registers_[rflags]);
             break;
         }
+
+        case OP_SCOL: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            uint8_t rid1 = code_[pc_++] & 0xF;
+            uint8_t rx1 = code_[pc_++] & 0xF;
+            uint8_t ry1 = code_[pc_++] & 0xF;
+            uint8_t rid2 = code_[pc_++] & 0xF;
+            uint8_t rx2 = code_[pc_++] & 0xF;
+            uint8_t ry2 = code_[pc_++] & 0xF;
+            
+            registers_[rd] = check_sprite_collision(
+                registers_[rid1],
+                static_cast<int32_t>(registers_[rx1]),
+                static_cast<int32_t>(registers_[ry1]),
+                registers_[rid2],
+                static_cast<int32_t>(registers_[rx2]),
+                static_cast<int32_t>(registers_[ry2])
+            ) ? 1 : 0;
+            break;
+        }
+        
+        case OP_TILE: {
+            uint8_t rlayer = code_[pc_++] & 0xF;
+            uint8_t rtx = code_[pc_++] & 0xF;
+            uint8_t rty = code_[pc_++] & 0xF;
+            uint8_t rtid = code_[pc_++] & 0xF;
+            
+            uint32_t layer = registers_[rlayer];
+            uint32_t tx = registers_[rtx];
+            uint32_t ty = registers_[rty];
+            uint32_t tid = registers_[rtid];
+            
+            if (layer < 4) {
+                uint32_t col = tx & 255;
+                uint32_t row = ty & 255;
+                tile_layers_[layer].tiles[row * 256 + col] = static_cast<uint16_t>(tid);
+            }
+            break;
+        }
+        
+        case OP_TSCROLL: {
+            uint8_t rlayer = code_[pc_++] & 0xF;
+            uint8_t rdx = code_[pc_++] & 0xF;
+            uint8_t rdy = code_[pc_++] & 0xF;
+            
+            uint32_t layer = registers_[rlayer];
+            int32_t dx = static_cast<int32_t>(registers_[rdx]);
+            int32_t dy = static_cast<int32_t>(registers_[rdy]);
+            
+            if (layer < 4) {
+                tile_layers_[layer].scroll_x = dx;
+                tile_layers_[layer].scroll_y = dy;
+            }
+            break;
+        }
+        
+        case OP_TDRAW: {
+            uint8_t rlayer = code_[pc_++] & 0xF;
+            uint32_t layer = registers_[rlayer];
+            if (layer < 4) {
+                int tile_size = get_layer_tile_size(layer);
+                int map_size_pixels = 256 * tile_size;
+                
+                int32_t sx = tile_layers_[layer].scroll_x % map_size_pixels;
+                if (sx < 0) sx += map_size_pixels;
+                int32_t sy = tile_layers_[layer].scroll_y % map_size_pixels;
+                if (sy < 0) sy += map_size_pixels;
+                
+                int32_t start_col = sx / tile_size;
+                int32_t start_row = sy / tile_size;
+                int32_t offset_x = -(sx % tile_size);
+                int32_t offset_y = -(sy % tile_size);
+                
+                int cols_to_draw = (640 / tile_size) + 1;
+                int rows_to_draw = (480 / tile_size) + 1;
+                
+                for (int ty = 0; ty < rows_to_draw; ++ty) {
+                    for (int tx = 0; tx < cols_to_draw; ++tx) {
+                        int32_t col = (start_col + tx) & 255;
+                        int32_t row = (start_row + ty) & 255;
+                        uint16_t tile_id = tile_layers_[layer].tiles[row * 256 + col];
+                        if (tile_id == 0) continue;
+                        
+                        int32_t screen_x = offset_x + tx * tile_size;
+                        int32_t screen_y = offset_y + ty * tile_size;
+                        
+                        if (draw_sprite_callback_) {
+                            draw_sprite_callback_(tile_id, screen_x, screen_y, 0);
+                        }
+                    }
+                }
+            }
+            break;
+        }
         
         case OP_BTNP: {
             uint8_t rd = code_[pc_++] & 0xF;
@@ -551,12 +697,100 @@ void BooeyVM::execute_instruction() {
             registers_[rd] = (held_mask & (1 << registers_[rbtn])) ? 1 : 0;
             break;
         }
+
+        case OP_SFX: {
+            uint8_t rid = code_[pc_++] & 0xF;
+            if (sfx_callback_) sfx_callback_(registers_[rid]);
+            break;
+        }
+        
+        case OP_PLAY: {
+            uint8_t rch = code_[pc_++] & 0xF;
+            uint8_t rfreq = code_[pc_++] & 0xF;
+            uint8_t rdur = code_[pc_++] & 0xF;
+            uint8_t rwave = code_[pc_++] & 0xF;
+            if (play_callback_) {
+                play_callback_(registers_[rch], registers_[rfreq], registers_[rdur], registers_[rwave]);
+            }
+            break;
+        }
+        
+        case OP_BTNR: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            uint8_t rbtn = code_[pc_++] & 0xF;
+            uint32_t released_mask = read_memory_32(0x1C008);
+            registers_[rd] = (released_mask & (1 << registers_[rbtn])) ? 1 : 0;
+            break;
+        }
         
         case OP_RND: {
             uint8_t rd = code_[pc_++] & 0xF;
             uint8_t rs = code_[pc_++] & 0xF;
             uint32_t max_val = registers_[rs];
             registers_[rd] = (max_val == 0) ? 0 : (std::rand() % max_val);
+            break;
+        }
+
+        case OP_SIN: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            uint8_t rs = code_[pc_++] & 0xF;
+            double angle_rad = static_cast<int32_t>(registers_[rs]) / 65536.0;
+            double sin_val = std::sin(angle_rad);
+            registers_[rd] = static_cast<uint32_t>(static_cast<int32_t>(sin_val * 65536.0));
+            break;
+        }
+        
+        case OP_DIST: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            uint8_t rx1 = code_[pc_++] & 0xF;
+            uint8_t ry1 = code_[pc_++] & 0xF;
+            uint8_t rx2 = code_[pc_++] & 0xF;
+            uint8_t ry2 = code_[pc_++] & 0xF;
+            
+            double dx = static_cast<double>(static_cast<int32_t>(registers_[rx1]) - static_cast<int32_t>(registers_[rx2]));
+            double dy = static_cast<double>(static_cast<int32_t>(registers_[ry1]) - static_cast<int32_t>(registers_[ry2]));
+            double dist = std::sqrt(dx * dx + dy * dy);
+            registers_[rd] = static_cast<uint32_t>(static_cast<int32_t>(dist));
+            break;
+        }
+        
+        case OP_FRAME: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            registers_[rd] = read_memory_32(0x1C010);
+            break;
+        }
+        
+        case OP_COS: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            uint8_t rs = code_[pc_++] & 0xF;
+            double angle_rad = static_cast<int32_t>(registers_[rs]) / 65536.0;
+            double cos_val = std::cos(angle_rad);
+            registers_[rd] = static_cast<uint32_t>(static_cast<int32_t>(cos_val * 65536.0));
+            break;
+        }
+        
+        case OP_ATAN2: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            uint8_t ry = code_[pc_++] & 0xF;
+            uint8_t rx = code_[pc_++] & 0xF;
+            double y = static_cast<int32_t>(registers_[ry]) / 65536.0;
+            double x = static_cast<int32_t>(registers_[rx]) / 65536.0;
+            double angle = std::atan2(y, x);
+            registers_[rd] = static_cast<uint32_t>(static_cast<int32_t>(angle * 65536.0));
+            break;
+        }
+        
+        case OP_ITOA: {
+            uint8_t rd = code_[pc_++] & 0xF;
+            uint8_t rs = code_[pc_++] & 0xF;
+            uint32_t addr = registers_[rd];
+            int32_t val = static_cast<int32_t>(registers_[rs]);
+            
+            std::string str = std::to_string(val);
+            for (size_t i = 0; i < str.length(); ++i) {
+                write_memory_8(addr + i, static_cast<uint8_t>(str[i]));
+            }
+            write_memory_8(addr + str.length(), 0);
             break;
         }
         
